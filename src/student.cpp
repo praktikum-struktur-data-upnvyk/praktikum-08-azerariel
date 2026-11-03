@@ -82,9 +82,20 @@ void clear(Node*& root) {
 // =============================================================================
 
 bool insert(Node*& root, int nilai) {
-    return false;
+    if (root == nullptr) {
+        root = new Node{nilai, nullptr, nullptr};
+        return true;
+    }
+    
+    if (nilai < root->data) {
+        return insert(root->left, nilai);
+    } else if (nilai > root->data) {
+        return insert(root->right, nilai);
+    } else {
+        // Nilai duplikat ditolak
+        return false;
+    }
 }
-
 // =============================================================================
 // SOAL 1b — cari                                                       15 poin
 // =============================================================================
@@ -113,7 +124,15 @@ bool insert(Node*& root, int nilai) {
 // =============================================================================
 
 const Node* cari(const Node* root, int nilai) {
-    return nullptr;
+    if (root == nullptr || root->data == nilai) {
+        return root;
+    }
+    
+    if (nilai < root->data) {
+        return cari(root->left, nilai);
+    } else {
+        return cari(root->right, nilai);
+    }
 }
 
 // =============================================================================
@@ -146,7 +165,15 @@ const Node* cari(const Node* root, int nilai) {
 // =============================================================================
 
 const Node* minimum(const Node* root) {
-    return nullptr;
+    if (root == nullptr) {
+        return nullptr;
+    }
+    
+    if (root->left == nullptr) {
+        return root;
+    }
+    
+    return minimum(root->left);
 }
 
 // =============================================================================
@@ -209,7 +236,38 @@ const Node* minimum(const Node* root) {
 // =============================================================================
 
 bool hapus(Node*& root, int nilai) {
-    return false;
+    if (root == nullptr) {
+        return false; // Nilai tidak ditemukan
+    }
+
+    if (nilai < root->data) {
+        return hapus(root->left, nilai);
+    } else if (nilai > root->data) {
+        return hapus(root->right, nilai);
+    } else {
+        // Node ditemukan (root adalah node yang ingin dihapus)
+        
+        // Keadaan 1 & 2: Tidak punya anak atau hanya punya 1 anak
+        if (root->left == nullptr) {
+            Node* temp = root;
+            root = root->right;
+            delete temp;
+            return true;
+        } else if (root->right == nullptr) {
+            Node* temp = root;
+            root = root->left;
+            delete temp;
+            return true;
+        }
+
+        // Keadaan 3: Punya 2 anak
+        // Cari successor (nilai terkecil di subtree kanan)
+        const Node* succ = minimum(root->right);
+        root->data = succ->data; // Salin nilai successor ke root
+        
+        // Hapus node successor lama dari subtree kanan
+        return hapus(root->right, succ->data);
+    }
 }
 
 // =============================================================================
@@ -250,7 +308,19 @@ bool hapus(Node*& root, int nilai) {
 // =============================================================================
 
 const Node* termahalTerbeli(const Node* root, int uang) {
-    return nullptr;
+    if (root == nullptr) {
+        return nullptr;
+    }
+
+    if (root->data > uang) {
+        return termahalTerbeli(root->left, uang);
+    } else {
+        const Node* rightResult = termahalTerbeli(root->right, uang);
+        if (rightResult != nullptr && rightResult->data > root->data) {
+            return rightResult;
+        }
+        return root;
+    }
 }
 
 // =============================================================================
